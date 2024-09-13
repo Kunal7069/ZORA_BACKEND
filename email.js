@@ -42,7 +42,7 @@ const sendEmail = (toEmail, subject, message) => {
   });
 };
 
-app.get("/send_mail", (req, res) => {
+app.post("/send_mail", (req, res) => {
   
   const { message } = req.body;
  
