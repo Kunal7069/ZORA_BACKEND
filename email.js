@@ -45,10 +45,10 @@ const sendEmail = (toEmail, subject, message) => {
 app.get("/send_mail", (req, res) => {
   
 
- 
+  const app1=['hii','bye']
   sendEmail("jaink7069@gmail.com", "Application Selected For role of SDE 1", "message");
 
-  res.json({ status: "success" });
+  res.send(app1);
 });
 
 app.listen(port, () => {
