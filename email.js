@@ -44,11 +44,11 @@ const sendEmail = (toEmail, subject, message) => {
 
 app.get("/send_mail", (req, res) => {
   
+  const { message } = req.body;
+ 
+  sendEmail("jaink7069@gmail.com", "Application Selected For role of SDE 1", message);
 
-  const app1=['hii','bye']
-  sendEmail("jaink7069@gmail.com", "Application Selected For role of SDE 1", "message");
-
-  res.send(app1);
+  res.json({ status: "success" });
 });
 
 app.listen(port, () => {
