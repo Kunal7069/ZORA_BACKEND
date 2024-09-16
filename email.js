@@ -44,9 +44,9 @@ const sendEmail = (toEmail, subject, message) => {
 
 app.post("/send_mail", (req, res) => {
   
-  const { message } = req.body;
+  const { message,to } = req.body;
  
-  sendEmail("jaink7069@gmail.com", "Application Selected For role of SDE 1", message);
+  sendEmail(to, "REPLY FOR YOUR MAIL", message);
 
   res.json({ status: "success" });
 });
