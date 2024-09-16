@@ -7,6 +7,7 @@ const imap = new Imap({
   host: "imap.gmail.com",
   port: 993,
   tls: true,
+  tlsOptions: { rejectUnauthorized: false } 
 });
 
 const openInbox = (callback) => {
@@ -14,6 +15,7 @@ const openInbox = (callback) => {
 };
 
 const fetchEmails = () => {
+  
   imap.connect();
 
   imap.once("ready", () => {
@@ -23,7 +25,7 @@ const fetchEmails = () => {
       imap.search(["ALL"], (err, results) => {
         if (err) throw err;
 
-        const emailIds = results.reverse().slice(3, 4);
+        const emailIds = results.reverse().slice(0,4);
 
         if (emailIds.length === 0) {
           console.log("No emails found.");
@@ -46,20 +48,49 @@ const fetchEmails = () => {
               try {
                 const lines = buffer.split("\n");
 
-                const lastThreeLines = lines.slice(-5).join("\n");
+                const dateLine = lines.find((line) => line.startsWith("Date:"));
+                const subjectLine = lines.find((line) =>
+                  line.startsWith("Subject:")
+                );
+                const fromLine = lines.find((line) => line.startsWith("From:"));
 
-                console.log("Last Three Lines:");
-                console.log(lastThreeLines);
+                if (dateLine) {
+                  const rawDate = dateLine.replace("Date: ", "").trim();
+                  const dateObject = new Date(rawDate);
+                  const subject = subjectLine.replace("Subject: ", "").trim();
+                  const from = fromLine.replace("From: ", "").trim();
+                  const day = dateObject.toLocaleDateString("en-US", {
+                    weekday: "long",
+                  });
+                  const date = dateObject.toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  });
+                  const time = dateObject.toLocaleTimeString("en-US", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                  });
+                  console.log("From:", from);
+                  console.log("Subject:", subject);
+                  console.log("Day:", day);
+                  console.log("Date:", date);
+                  console.log("Time:", time);
+                  console.log("Read Status:", isRead ? "Read" : "Unread");
+                }
                 const parsed = await simpleParser(buffer);
 
-                if (parsed.text) {
-                  console.log("Body:", parsed.text);
-                } else if (parsed.textAsHtml) {
-                  console.log("Body (HTML):", parsed.textAsHtml);
-                } else {
-                  console.log("Body: Not available");
-                }
-                console.log("Read Status:", isRead ? "Read" : "Unread");
+                // if (parsed.text) {
+                //   const cleanText = parsed.text
+                //     .replace(/<[^>]*>/g, "") // Remove HTML tags
+                //     .replace(/&[a-z]+;/g, ""); // Remove HTML entities like &nbsp;
+
+                //   console.log("Body (Clean Text):", cleanText);
+                // } else {
+                //   console.log("Body: Not available");
+                // }
+                
                 console.log("--------------------------");
               } catch (err) {
                 console.error("Error parsing email:", err);
