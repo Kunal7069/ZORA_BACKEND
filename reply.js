@@ -62,7 +62,7 @@ app.post('/reply', async (req, res) => {
 
     try {
         await sendReplyEmail(toEmail, originalSubject, message);
-        res.send('Reply sent successfully!');
+        res.json({ status: "success" });
     } catch (err) {
         res.status(500).send('Error sending reply: ' + err.message);
     }
