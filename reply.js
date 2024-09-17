@@ -17,8 +17,8 @@ app.use(express.json());
 // Gmail IMAP and SMTP credentials
 const config = {
     imap: {
-        user: 'jaink987654321@gmail.com',
-        password: 'ervs hpiv zlmn udcf',
+        user: 'kj278246@gmail.com',
+        password: 'xbtd psbs debj uotv',
         host: 'imap.gmail.com',
         port: 993,
         tls: true,
@@ -32,13 +32,13 @@ async function sendReplyEmail(toEmail, originalSubject, message) {
     const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
-            user: 'jaink987654321@gmail.com',
-            pass: 'ervs hpiv zlmn udcf',  // You need to generate an app-specific password for Gmail
+            user: 'kj278246@gmail.com',
+            pass: 'xbtd psbs debj uotv',  // You need to generate an app-specific password for Gmail
         },
     });
 
     const mailOptions = {
-        from: 'jaink987654321@gmail.com',
+        from: 'kj278246@gmail.com',
         to: toEmail,
         subject: 'RE: ' + originalSubject,
         text: message,

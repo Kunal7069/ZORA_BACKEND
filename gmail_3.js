@@ -15,8 +15,8 @@ app.use(express.json());
 // Gmail IMAP credentials
 const config = {
     imap: {
-        user: 'jaink987654321@gmail.com',
-        password: 'ervs hpiv zlmn udcf',
+        user: 'kj278246@gmail.com',
+        password: 'xbtd psbs debj uotv',
         host: 'imap.gmail.com',
         port: 993,
         tls: true,
