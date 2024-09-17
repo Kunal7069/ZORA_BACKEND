@@ -1,6 +1,6 @@
-const express = require("express");
 const imaps = require('imap-simple');
-const { simpleParser } = require("mailparser");
+const nodemailer = require('nodemailer');
+const express = require("express");
 const cors = require("cors");
 const app = express();
 const port = 3000;
@@ -11,9 +11,7 @@ app.use(
       credentials: true,
     })
   );
-  app.use(express.json());
-
-
+app.use(express.json());
 // Gmail IMAP credentials
 const config = {
     imap: {
@@ -22,7 +20,7 @@ const config = {
         host: 'imap.gmail.com',
         port: 993,
         tls: true,
-        authTimeout: 3000,
+        authTimeout: 9000,
         tlsOptions: { rejectUnauthorized: false }
     }
 };
@@ -73,7 +71,7 @@ async function fetchAllEmails(req,res) {
 
         // Search for all emails within the past 7 days
         const sinceDate = new Date();
-        sinceDate.setDate(sinceDate.getDate() - 7); // Fetch emails from the past 7 days
+        sinceDate.setDate(sinceDate.getDate() - 3); // Fetch emails from the past 7 days
 
         const searchCriteria = [['SINCE', sinceDate]];
         const fetchOptions = {
@@ -138,10 +136,11 @@ async function fetchAllEmails(req,res) {
     }
 }
 
-
 app.get("/fetch-emails", fetchAllEmails);
 
 // Start the server
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
+
+
