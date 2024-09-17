@@ -13,17 +13,7 @@ app.use(
   );
 app.use(express.json());
 // Gmail IMAP credentials
-const config = {
-    imap: {
-        user: 'kj278246@gmail.com',
-        password: 'xbtd psbs debj uotv',
-        host: 'imap.gmail.com',
-        port: 993,
-        tls: true,
-        authTimeout: 9000,
-        tlsOptions: { rejectUnauthorized: false }
-    }
-};
+
 
 // Helper function to extract plain text from the raw message body
 function extractPlainText(body) {
@@ -63,9 +53,21 @@ function formatDate(dateString) {
 }
 
 // Function to fetch all emails
-async function fetchAllEmails(req,res) {
+async function fetchAllEmails(req,res,email,password) {
     const emails=[]
     try {
+        console.log(email,password)
+        const config = {
+            imap: {
+                user: email,
+                password: password,
+                host: 'imap.gmail.com',
+                port: 993,
+                tls: true,
+                authTimeout: 9000,
+                tlsOptions: { rejectUnauthorized: false }
+            }
+        };
         const connection = await imaps.connect({ imap: config.imap });
         await connection.openBox('INBOX');
 
@@ -109,26 +111,19 @@ async function fetchAllEmails(req,res) {
             const plainText = extractPlainText(rawBody);
 
             const isRead = message.attributes.flags.includes('\\Seen') ? 'Read' : 'Unread';
-            // Print the email details
-            // console.log('from:', from);
-            // console.log('subject:', subject);
-            // console.log('date:', `${formattedDate}`);
-            // console.log('day:', `${dayName}`);
-            // console.log('time:', `${formattedTime}`);
-            // console.log('cleanText:', plainText);
-            // console.log('readStatus:', isRead);
+            
             emails.push({
                 from,
                 subject,
-                formattedDate, // or use customFormattedDate for "DD-MM-YYYY"
+                formattedDate,
                 dayName,
                 formattedTime,
                 plainText,
                 readStatus: isRead,
               });
-            // console.log('-------------------------------------');
+           
         }
-        console.log(emails)
+    
         res.json(emails);
     } catch (err) {
         console.error('Error fetching emails:', err);
@@ -136,8 +131,13 @@ async function fetchAllEmails(req,res) {
     }
 }
 
-app.get("/fetch-emails", fetchAllEmails);
 
+app.post('/fetch-emails',  async (req, res) => {
+    const { email,password } = req.body;
+    console.log(email,password)
+    fetchAllEmails(req,res,email,password);
+    
+});
 // Start the server
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);

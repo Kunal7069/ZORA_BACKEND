@@ -17,8 +17,8 @@ app.use(express.json());
 // Gmail IMAP and SMTP credentials
 const config = {
     imap: {
-        user: 'kj278246@gmail.com',
-        password: 'xbtd psbs debj uotv',
+        user: email,
+        password: password,
         host: 'imap.gmail.com',
         port: 993,
         tls: true,
@@ -28,17 +28,17 @@ const config = {
 };
 
 // Function to send a reply to the fetched email
-async function sendReplyEmail(toEmail, originalSubject, message) {
+async function sendReplyEmail(toEmail, originalSubject, message, email,password) {
     const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
-            user: 'kj278246@gmail.com',
-            pass: 'xbtd psbs debj uotv',  // You need to generate an app-specific password for Gmail
+            user: email,
+            pass:password,  // You need to generate an app-specific password for Gmail
         },
     });
 
     const mailOptions = {
-        from: 'kj278246@gmail.com',
+        from: email,
         to: toEmail,
         subject: 'RE: ' + originalSubject,
         text: message,
@@ -54,14 +54,14 @@ async function sendReplyEmail(toEmail, originalSubject, message) {
 
 // Route to fetch the latest email and send a reply
 app.post('/reply', async (req, res) => {
-    const { toEmail, originalSubject, message } = req.body;
+    const { toEmail, originalSubject, message, email,password } = req.body;
 
     if (!toEmail || !originalSubject || !message) {
         return res.status(400).send('Missing required fields');
     }
 
     try {
-        await sendReplyEmail(toEmail, originalSubject, message);
+        await sendReplyEmail(toEmail, originalSubject, message, email,password);
         res.json({ status: "success" });
     } catch (err) {
         res.status(500).send('Error sending reply: ' + err.message);

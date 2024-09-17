@@ -14,17 +14,7 @@ app.use(
 app.use(express.json());
 
 // Gmail IMAP credentials
-const config = {
-    imap: {
-        user: 'kj278246@gmail.com', // your email
-        password: 'xbtd psbs debj uotv', // your app password
-        host: 'imap.gmail.com',
-        port: 993,
-        tls: true,
-        authTimeout: 3000,
-        tlsOptions: { rejectUnauthorized: false }
-    }
-};
+
 
 function extractPlainText(body) {
     const startMarker = 'Content-Type: text/plain; charset="UTF-8"';
@@ -69,9 +59,20 @@ const formatDateTime = (dateString) => {
 };
 
 // Function to fetch all sent emails
-async function fetchSentEmails(req,res) {
+async function fetchSentEmails(req,res,email,password) {
     const replies=[]
     try {
+        const config = {
+            imap: {
+                user: email, // your email
+                password: password, // your app password
+                host: 'imap.gmail.com',
+                port: 993,
+                tls: true,
+                authTimeout: 3000,
+                tlsOptions: { rejectUnauthorized: false }
+            }
+        };
         // Connect to IMAP server
         const connection = await imaps.connect({ imap: config.imap });
 
@@ -99,12 +100,7 @@ async function fetchSentEmails(req,res) {
             // Extract the body part
             const bodyPart = msg.parts.find(part => part.which === 'TEXT');
             const plainText_1 = bodyPart ? bodyPart.body : '(No Body)';
-            const plainText = extractPlainText(plainText_1)
-            // console.log(`To: ${to}`);
-            // console.log('Subject',`${subject}`);
-            // console.log(`Date: ${formattedDate}`);
-            // console.log(`Time: ${formattedTime}`);
-            // console.log(`Body: ${plainText}`);
+            const plainText = extractPlainText(plainText_1);
             replies.push({
                 to,
                 subject,
@@ -112,7 +108,6 @@ async function fetchSentEmails(req,res) {
                 formattedTime,
                 plainText
               });
-            // console.log('--------------------------');
         });
         console.log("REPLIES",replies)
         res.json(replies);
@@ -124,8 +119,13 @@ async function fetchSentEmails(req,res) {
     }
 }
 
-app.get("/fetch-sent-emails", fetchSentEmails);
 
+app.post('/fetch-sent-emails',  async (req, res) => {
+    const { email,password } = req.body;
+    console.log(email,password)
+    fetchSentEmails(req,res,email,password);
+    
+});
 // Start the server
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
