@@ -15,17 +15,7 @@ app.use(
 app.use(express.json());
 
 // Gmail IMAP and SMTP credentials
-const config = {
-    imap: {
-        user: email,
-        password: password,
-        host: 'imap.gmail.com',
-        port: 993,
-        tls: true,
-        authTimeout: 3000,
-        tlsOptions: { rejectUnauthorized: false } 
-    }
-};
+
 
 // Function to send a reply to the fetched email
 async function sendReplyEmail(toEmail, originalSubject, message, email,password) {
