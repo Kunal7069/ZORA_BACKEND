@@ -154,7 +154,10 @@ async function fetchAllEmails(req,res,email,password) {
     }
 }
 
-
+app.get('/',  async (req, res) => {
+    res.json({ status: "ZORA BACKEND IS RUNNING" });
+    
+});
 app.post('/fetch-emails',  async (req, res) => {
     const { email,password } = req.body;
     console.log(email,password)
