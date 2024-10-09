@@ -14,6 +14,29 @@ app.use(
 app.use(express.json());
 // Gmail IMAP credentials
 
+async function sendReplyEmail(toEmail, originalSubject, message, email,password) {
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: email,
+            pass:password,  // You need to generate an app-specific password for Gmail
+        },
+    });
+
+    const mailOptions = {
+        from: email,
+        to: toEmail,
+        subject: 'RE: ' + originalSubject,
+        text: message,
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log('Reply sent successfully to:', toEmail);
+    } catch (err) {
+        console.error('Error sending reply:', err);
+    }
+}
 
 // Helper function to extract plain text from the raw message body
 function extractPlainText(body) {
@@ -137,6 +160,20 @@ app.post('/fetch-emails',  async (req, res) => {
     console.log(email,password)
     fetchAllEmails(req,res,email,password);
     
+});
+app.post('/reply', async (req, res) => {
+    const { toEmail, originalSubject, message, email,password } = req.body;
+
+    if (!toEmail || !originalSubject || !message) {
+        return res.status(400).send('Missing required fields');
+    }
+
+    try {
+        await sendReplyEmail(toEmail, originalSubject, message, email,password);
+        res.json({ status: "success" });
+    } catch (err) {
+        res.status(500).send('Error sending reply: ' + err.message);
+    }
 });
 // Start the server
 app.listen(port, () => {
