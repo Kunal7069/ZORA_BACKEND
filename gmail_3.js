@@ -178,6 +178,36 @@ app.post('/reply', async (req, res) => {
         res.status(500).send('Error sending reply: ' + err.message);
     }
 });
+
+app.post('/summarize', async (req, res) => {
+    const { prompt} = req.body;
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
+        const runFetch = async () => {
+          try {
+            const response = await fetch(
+              'https://ab4d254740f884ca1880358531f9e89a-21771294.ap-south-1.elb.amazonaws.com/fastapi/query',
+              {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  prompt:prompt,
+                }),
+              }
+            );
+            const data = await response.json();
+            console.log(data);
+            res.json({ generated_text: data['generated_text'].split('\n')[1] });
+          } catch (error) {
+            console.error('Error:', error);
+          }
+        };
+
+runFetch();
+});
+
 // Start the server
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
